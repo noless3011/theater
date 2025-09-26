@@ -7,7 +7,7 @@ function App(): React.JSX.Element {
         onClick={ipcHandle}
         className="bg-green-500 w-36 h-12 rounded-4xl flex justify-center items-center"
       >
-        Ping cmm
+        Anh rat dep trai
       </button>
     </div>
   )

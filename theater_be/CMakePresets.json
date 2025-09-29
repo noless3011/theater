@@ -1,0 +1,40 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "gcc",
+      "displayName": "GCC 13.2.0 x86_64-w64-mingw32",
+      "description": "Using compilers: C = C:\\ProgramData\\mingw64\\mingw64\\bin\\gcc.exe, CXX = C:\\ProgramData\\mingw64\\mingw64\\bin\\g++.exe",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_C_COMPILER": "C:/ProgramData/mingw64/mingw64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/ProgramData/mingw64/mingw64/bin/g++.exe",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc-build",
+      "displayName": "Build with GCC",
+      "configurePreset": "gcc"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "gcc-test",
+      "displayName": "Test with GCC",
+      "configurePreset": "gcc",
+      "output": {
+        "outputOnFailure": true,
+        "verbosity": "default"
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": false
+      }
+    }
+  ]
+}

@@ -11,6 +11,12 @@ An Electron application with React and TypeScript
 ### Install
 
 ```bash
+$ cd theater
+```
+
+You should be in theater/theater
+
+```bash
 $ npm install
 ```
 

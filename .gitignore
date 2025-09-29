@@ -90,3 +90,17 @@ Desktop.ini
 
 # Linux
 *~
+
+# CMake
+# Build directories
+[Cc][Mm][Aa][Kk][Ee][Bb][Uu][Ii][Ll][Dd]-*/
+cmake-build-*/
+build/
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+# User-specific presets
+CMakeUserPresets.json

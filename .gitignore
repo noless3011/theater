@@ -104,3 +104,6 @@ CTestTestfile.cmake
 Makefile
 # User-specific presets
 CMakeUserPresets.json
+
+
+.vscode/

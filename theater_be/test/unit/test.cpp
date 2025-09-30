@@ -1,4 +1,4 @@
-#include "main.h"
+#include "theater.h"
 #include <iostream>
 #include <cassert>
 

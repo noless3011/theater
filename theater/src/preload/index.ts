@@ -1,8 +1,13 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  native: {
+    add: (a: number, b: number): Promise<number> => ipcRenderer.invoke('native:add', a, b),
+    printMessage: (): Promise<string> => ipcRenderer.invoke('native:printMessage')
+  }
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

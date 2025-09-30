@@ -1,18 +1,38 @@
-appId: com.electron.app
+appId: com.electron.theater
 productName: theater
 directories:
   buildResources: build
+  output: dist
 files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  # Include the native addon
+  - build/Release/*.node
 asarUnpack:
   - resources/**
+  # Don't pack native addons in asar
+  - build/Release/*.node
 win:
   executableName: theater
+  target:
+    - target: nsis
+      arch:
+        - x64
+  extraResources:
+    # Include DLL files
+    - from: native
+      to: .
+      filter:
+        - '*.dll'
+    # Include the compiled native addon
+    - from: build/Release
+      to: .
+      filter:
+        - '*.node'
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -26,6 +46,16 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  extraResources:
+    # Include dylib files for macOS
+    - from: native
+      to: .
+      filter:
+        - '*.dylib'
+    - from: build/Release
+      to: .
+      filter:
+        - '*.node'
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
@@ -35,11 +65,17 @@ linux:
     - deb
   maintainer: electronjs.org
   category: Utility
+  extraResources:
+    # Include .so files for Linux
+    - from: native
+      to: .
+      filter:
+        - '*.so'
+    - from: build/Release
+      to: .
+      filter:
+        - '*.node'
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
-electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/
+buildDependenciesFromSource: false

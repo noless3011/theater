@@ -2,9 +2,34 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { createRequire } from 'module'
+
+const require = createRequire(import.meta.url)
+
+// Import the native addon
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let nativeAddon: any
+try {
+  // In development
+  if (is.dev) {
+    nativeAddon = require('../../native/build/Release/native_addon.node')
+  } else {
+    // In production, the .node file should be in resources
+    nativeAddon = require(join(process.resourcesPath, 'native_addon.node'))
+  }
+} catch (error) {
+  console.error('Failed to load native addon:', error)
+}
+
+// Type definitions for the native addon
+interface NativeAddon {
+  add(a: number, b: number): number
+  printMessage(): void
+}
+
+const native: NativeAddon = nativeAddon
 
 function createWindow(): void {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -13,7 +38,9 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false
     }
   })
 
@@ -26,49 +53,53 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  // Test the native addon
+  if (native) {
+    console.log('Testing native addon...')
+    const result = native.add(10, 20)
+    console.log(`10 + 20 = ${result}`)
+    native.printMessage()
+  }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// IPC handlers to expose native functions to renderer
+ipcMain.handle('native:add', (_event, a: number, b: number) => {
+  if (!native) {
+    throw new Error('Native addon not loaded')
+  }
+  return native.add(a, b)
+})
+
+ipcMain.handle('native:printMessage', () => {
+  if (!native) {
+    throw new Error('Native addon not loaded')
+  }
+  native.printMessage()
+  return 'Message printed'
+})
+
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

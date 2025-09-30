@@ -4,7 +4,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        // Externalize the native addon so it's not bundled
+        external: ['native_addon']
+      }
+    }
   },
   preload: {
     plugins: [externalizeDepsPlugin()]

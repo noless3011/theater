@@ -23,8 +23,21 @@ add_library(Theater SHARED
 set_target_properties(Theater PROPERTIES OUTPUT_NAME "theater")
 
 target_include_directories(Theater PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/vendors/spdlog/include"
 )
+
+set(SPDLOG_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/spdlog/lib")
+find_library(SPDLOG_LIBRARY_FILE NAMES spdlogd spdlog PATHS "${SPDLOG_LIBRARY_DIR}")
+if(SPDLOG_LIBRARY_FILE)
+    message(STATUS "Found spdlog library: ${SPDLOG_LIBRARY_FILE}")
+    # target_link_directories(Theater PRIVATE "${SPDLOG_LIBRARY_DIR}") # Not strictly needed
+    target_link_libraries(Theater PRIVATE "${SPDLOG_LIBRARY_FILE}")
+else()
+    # If spdlog is header-only in your setup, this is not an error.
+    message(WARNING "spdlog library not found in ${SPDLOG_LIBRARY_DIR}. Searched for 'spdlogd' or 'spdlog'. If spdlog is header-only, this is fine.")
+endif()
+
 
 if(WIN32)
   target_compile_definitions(Theater PRIVATE "THEATER_EXPORTS")
@@ -34,6 +47,9 @@ if(WIN32)
     uuid
     winmm
     dsound
+    psapi
+    propsys
+    mmdevapi
   )
 endif()
 

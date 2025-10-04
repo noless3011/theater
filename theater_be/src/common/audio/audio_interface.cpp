@@ -1,12 +1,12 @@
 #include "audio_interface.h"
 
-void AudioInterface::QueueAudioChunk(const AudioChunk& chunk)
+void theater::AudioInterface::QueueAudioChunk(const AudioChunk& chunk)
 {
     std::lock_guard<std::mutex> lock(m_audioMutex);
     m_audioQueue.push(chunk);
 }
 
-bool AudioInterface::GetNextAudioChunk(AudioChunk& outChunk)
+bool theater::AudioInterface::GetNextAudioChunk(AudioChunk& outChunk)
 {
     std::lock_guard<std::mutex> lock(m_audioMutex);
     if (m_audioQueue.empty()) {
@@ -18,13 +18,13 @@ bool AudioInterface::GetNextAudioChunk(AudioChunk& outChunk)
 }
 
 
-size_t AudioInterface::GetQueueSize()
+size_t theater::AudioInterface::GetQueueSize()
 {
     std::lock_guard<std::mutex> lock(m_audioMutex);
     return m_audioQueue.size();
 }
 
-void AudioInterface::ClearQueue()
+void theater::AudioInterface::ClearQueue()
 {
     std::lock_guard<std::mutex> lock(m_audioMutex);
     std::queue<AudioChunk> emptyQueue;

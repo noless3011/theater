@@ -12,7 +12,8 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "CMake configuration failed"
     }
-} catch {
+}
+catch {
     Write-Host "Error: CMake configuration failed: $_" -ForegroundColor Red
     exit 1
 }
@@ -23,7 +24,8 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "CMake build failed"
     }
-} catch {
+}
+catch {
     Write-Host "Error: CMake build failed: $_" -ForegroundColor Red
     exit 1
 }
@@ -31,7 +33,8 @@ try {
 Write-Host "Copying library files for node-gyp..." -ForegroundColor Yellow
 try {
     .\copy_lib_files.ps1
-} catch {
+}
+catch {
     Write-Host "Error: Failed to copy library files: $_" -ForegroundColor Red
     exit 1
 }
@@ -45,7 +48,8 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Node.js native addon build failed"
     }
-} catch {
+}
+catch {
     Write-Host "Error: Node.js native addon build failed: $_" -ForegroundColor Red
     exit 1
 }
@@ -56,4 +60,4 @@ Write-Host "  - theater_be/out/build/gcc/libtheater.dll (C++ shared library)" -F
 Write-Host "  - theater_be/out/build/gcc/libtheater.dll.a (import library)" -ForegroundColor Gray
 Write-Host "  - theater/native/libtheater.lib (copied for node-gyp)" -ForegroundColor Gray
 Write-Host "  - theater/native/libtheater.dll (copied for runtime)" -ForegroundColor Gray
-Write-Host "  - theater/native/build/Release/native_addon.node (Node.js addon)" -ForegroundColor Gray
+Write-Host "  - theater/native/build/Release/theater_sound_api.node (Node.js addon)" -ForegroundColor Gray
